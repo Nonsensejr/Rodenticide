@@ -10,5 +10,5 @@ DEPS = rdtc.h
 		$(CC) -c -o $@ $< $(CFLAGS) $(LDIR) $(LIBS)
 
 rdtc: $(OBJ)
-		gcc -o $@ $^ $(CFLAGS) 
+		gcc -o $@ $^ $(CFLAGS) $(LDIR) $(LIBS)
 

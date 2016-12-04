@@ -5,11 +5,14 @@
 #include "rdtc.h"
 
 Display *dis;
+xdo_t *xdo;
 
 int startCapture(){
+    Window *curWindow;
+    xdo_get_window_at_mouse(xdo, curWindow);
     XGrabKeyboard(
             dis, 
-            DefaultRootWindow( dis ), 
+            *curWindow, 
             True, 
             GrabModeAsync, 
             GrabModeSync, 
@@ -43,7 +46,8 @@ int endCapture(){
 }
 
 int main(int argc, char *argv[]){
-    dis=XOpenDisplay((char *)0);
+    dis = XOpenDisplay((char *)0);
+    xdo = xdo_new_with_opened_display(dis, "rdtc", True);
     startCapture();
     controlling();
     endCapture();

@@ -1,14 +1,14 @@
 IDIR=/opt/X11/include/
+LDIR=/opt/X11/lib/
+XDODIR=xdotool/
+XDOLIB=xdo
+LIBS=X11
+CFLAGS=-I$(IDIR) -L$(LDIR) -L$(XDODIR) -l$(LIBS) -l$(XDOLIB) 
 CC=gcc
-CFLAGS=-I$(IDIR)
-LDIR =-L/opt/X11/lib/
-OBJ = rdtc.o rdtc.o 
-LIBS=-lX11
-DEPS = rdtc.h
+OBJ=rdtc.o
 
-%.o: %.c $(DEPS)
-		$(CC) -c -o $@ $< $(CFLAGS) $(LDIR) $(LIBS)
+xdotool/%.o: %.c
+		$(CC) -c -o $@ $< $(CFLAGS)
 
 rdtc: $(OBJ)
-		gcc -o $@ $^ $(CFLAGS) $(LDIR) $(LIBS)
-
+		gcc -o $@ $^ $(CFLAGS)

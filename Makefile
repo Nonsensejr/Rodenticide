@@ -12,3 +12,6 @@ xdotool/%.o: %.c
 
 rdtc: $(OBJ)
 		gcc -o $@ $^ $(CFLAGS)
+
+clean:
+	rm rdtc rdtc.o

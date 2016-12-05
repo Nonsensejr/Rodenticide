@@ -14,9 +14,13 @@ int isMovement(int keyCode){
 }
 
 int startCapture(xdo_t *xdo, Display *dis){
+    Window window;
+    unsigned char *name;
+    int name_len;
+    int name_type;
     XGrabKeyboard(
             dis, 
-            DefaultRootWindow(dis), 
+            window, 
             True, 
             GrabModeAsync, 
             GrabModeAsync, 
@@ -36,65 +40,74 @@ int controlling(xdo_t *xdo, Display *dis){
         XNextEvent(dis, &event);
 	    switch (event.type){
             case KeyPress:
-                
                 kevent = *(XKeyEvent*)&event;
                 move_dist = BASE_SPEED + (GROWTH_RATIO * acc);  
-
                 switch(kevent.keycode){
                     case BUTTON:
                         xdo_get_focused_window(xdo, &window);
                         xdo_click_window( xdo, window, 1); 
                         break;
+
                     case BUTTON_1:
                         xdo_get_focused_window(xdo, &window);
                         xdo_click_window( xdo, window, 1); 
                         break;
+
                     case BUTTON_2:
                         xdo_get_focused_window(xdo, &window);
                         xdo_click_window( xdo, window, 2); 
                         break;
+
                     case BUTTON_3:
                         xdo_get_focused_window(xdo, &window);
                         xdo_click_window( xdo, window, 3); 
                         break;
+
                     case KEY_LEFT_UP:
                         move_dist = move_dist * OBLIQUE_RATE;
                         xdo_move_mouse_relative( xdo,
                                 -1 * move_dist,
                                 -1 * move_dist );
                         break;
+
                     case KEY_UP:
                         xdo_move_mouse_relative( xdo,
                                 0,
                                 -1 * move_dist );
                         break;
+
                     case KEY_RIGHT_UP:
                         move_dist = move_dist * OBLIQUE_RATE;
                         xdo_move_mouse_relative( xdo,
                                 move_dist,
                                 -1 * move_dist );
                         break;
+
                     case KEY_LEFT:
                         xdo_move_mouse_relative( xdo,
                                 -1 * move_dist,
                                 0 );
                         break;
+
                     case KEY_RIGHT:
                         xdo_move_mouse_relative( xdo,
                                 move_dist,
                                 0 );
                         break;
+
                     case KEY_LEFT_DOWN:
                         move_dist = move_dist * OBLIQUE_RATE;
                         xdo_move_mouse_relative( xdo,
                                 -1 * move_dist,
                                 move_dist );
                         break;
+
                     case KEY_DOWN:
                         xdo_move_mouse_relative( xdo,
                                 0,
                                 move_dist );
                         break;
+
                     case KEY_RIGHT_DOWN:
                         move_dist = move_dist * OBLIQUE_RATE;
                         xdo_move_mouse_relative(
@@ -102,18 +115,20 @@ int controlling(xdo_t *xdo, Display *dis){
                                 move_dist,
                                 move_dist );
                         break;
+
                     case SCROLL_UP:
                         xdo_get_focused_window(xdo, &window);
                         xdo_click_window( xdo, window, 4); 
                         break;
+
                     case SCROLL_DOWN:
                         xdo_get_focused_window(xdo, &window);
                         xdo_click_window( xdo, window, 5); 
                         break;
+
                     case KEY_ESC:
                         endControl = True;
                         break;
-
                 }
                 break;
 
@@ -136,9 +151,8 @@ int controlling(xdo_t *xdo, Display *dis){
                     else {
 				    	acc = 0;
 				    }
-
+                    break;
         }
-        fflush(stdout);
 	}
     return 0;
 }

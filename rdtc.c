@@ -6,6 +6,22 @@
 #include "xdotool/xdo.h"
 #include "rdtc.h"
 
+const int MOVEMENT_KEYS[9] = { 
+    KEY_LEFT_UP,
+    KEY_UP,
+    KEY_RIGHT_UP,
+    KEY_LEFT,
+    KEY_RIGHT,
+    KEY_LEFT_DOWN,
+    KEY_DOWN,
+    KEY_RIGHT_DOWN };
+
+int isMovement(int keyCode);
+void startCapture();
+void endCapture();
+void controlling();
+
+
 int isMovement(int keyCode){
     for(int i = 0; i < sizeof(MOVEMENT_KEYS);i++){
         if(keyCode == MOVEMENT_KEYS[i]) return True;
@@ -13,11 +29,10 @@ int isMovement(int keyCode){
     return False;
 }
 
-int startCapture(xdo_t *xdo, Display *dis){
+
+void startCapture(xdo_t *xdo, Display *dis){
     Window window;
-    unsigned char *name;
-    int name_len;
-    int name_type;
+    xdo_get_focused_window(xdo, &window);
     XGrabKeyboard(
             dis, 
             window, 
@@ -25,10 +40,10 @@ int startCapture(xdo_t *xdo, Display *dis){
             GrabModeAsync, 
             GrabModeAsync, 
             CurrentTime );
-    return 0;
 }
 
-int controlling(xdo_t *xdo, Display *dis){
+
+void controlling(xdo_t *xdo, Display *dis){
 	XEvent event;
     XKeyEvent kevent;
     Window window;
@@ -36,6 +51,8 @@ int controlling(xdo_t *xdo, Display *dis){
     int acc = 0;
 	int endControl = False;
     int move_dist = 0;
+    int m_down = False;
+
 	while (!endControl){
         XNextEvent(dis, &event);
 	    switch (event.type){
@@ -44,8 +61,18 @@ int controlling(xdo_t *xdo, Display *dis){
                 move_dist = BASE_SPEED + (GROWTH_RATIO * acc);  
                 switch(kevent.keycode){
                     case BUTTON:
-                        xdo_get_focused_window(xdo, &window);
-                        xdo_click_window( xdo, window, 1); 
+                        if(!m_down){
+                            xdo_get_focused_window(xdo, &window);
+                            xdo_mouse_down( xdo, window, 1); 
+                            xdo_move_mouse_relative(xdo, 2, 0);
+                            xdo_move_mouse_relative(xdo, -2, 0);
+                            m_down = True;
+                        }
+                        else{
+                            xdo_get_focused_window(xdo, &window);
+                            xdo_mouse_up( xdo, window, 1); 
+                            m_down = False;
+                        }
                         break;
 
                     case BUTTON_1:
@@ -145,28 +172,27 @@ int controlling(xdo_t *xdo, Display *dis){
 								if( (BASE_SPEED + (acc*GROWTH_RATIO)) > MAX_SPEED ) acc -= 1; 
 							}
 						}
-						
-					}
-					// Key released
+                    }
+					// All Key released
                     else {
-				    	acc = 0;
-				    }
+                        acc = 0;
+                    }
+
                     break;
         }
 	}
-    return 0;
 }
 
-int endCapture(xdo_t *xdo, Display *dis){
+void endCapture(xdo_t *xdo, Display *dis){
     XAllowEvents(
             dis,
             SyncKeyboard,
             CurrentTime
             );
-    return 0;
+    XUngrabKeyboard(dis, CurrentTime);
 }
 
-int main(int argc, char *argv[]){
+void main(int argc, char *argv[]){
 
     Display *dis;
     xdo_t *xdo;
@@ -175,12 +201,30 @@ int main(int argc, char *argv[]){
        perror(argv[0]);
        exit(1);
     }
+    xdo = xdo_new_with_opened_display(dis, "rdtc", False);
 
-    xdo = xdo_new_with_opened_display(dis, "rdtc", True);
-    startCapture(xdo, dis);
-    controlling(xdo, dis);
-    endCapture(xdo, dis);
-    return 0;
+    /* Grab on all screen root windows */
+    for (int i = 0; i < ScreenCount(dis); i++) {
+      Window root = RootWindow(dis, i);
+      XGrabKey(dis, START, 0, root, False, GrabModeAsync, GrabModeAsync);
+    }
+
+    while (1) {
+        XEvent e;
+        XKeyEvent kevent;
+        XNextEvent(dis, &e);
+        switch (e.type) {
+            case KeyPress:
+                kevent = *(XKeyEvent*)&e;
+                if(kevent.keycode == START){
+                    startCapture(xdo, dis);
+                    controlling(xdo, dis);
+                    endCapture(xdo, dis);
+                }
+                break;
+        }
+    }
+    xdo_free(xdo);
 };
 
 

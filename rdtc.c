@@ -74,7 +74,6 @@ void controlling(xdo_t *xdo, Display *dis){
                             m_down = False;
                         }
                         break;
-
                     case BUTTON_1:
                         xdo_get_focused_window(xdo, &window);
                         xdo_click_window( xdo, window, 1); 

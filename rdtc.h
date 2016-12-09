@@ -13,9 +13,9 @@
 #define KEY_DOWN 53
 #define KEY_RIGHT_DOWN 54 
 #define KEY_ESC 9 
-#define BASE_SPEED 1 
-#define GROWTH_RATIO 3 
+#define BASE_SPEED 4 
+#define GROWTH_RATIO 4 
 #define OBLIQUE_RATE 0.7
-#define MAX_SPEED 50
+#define MAX_SPEED 100
 #define START 148
 

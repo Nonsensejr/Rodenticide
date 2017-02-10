@@ -3,7 +3,7 @@
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 #include <X11/Xos.h>
-#include "xdotool/xdo.h"
+#include "xdo.h"
 #include "rdtc.h"
 
 const int MOVEMENT_KEYS[9] = { 
